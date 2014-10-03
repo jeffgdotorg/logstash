@@ -151,7 +151,7 @@ class LogStash::Outputs::OpenNMS < LogStash::Outputs::Base
       outParmValue = outParm.add_element "value"
       outParmValue.attributes["type"] = "string"
       outParmValue.attributes["encoding"] = "text"
-      outParmValue.text = REXML::CData.new(inParmValue)
+      outParmValue.text = REXML::CData.new(inParmValue.to_s.delete("\000"))
     end
     outSeverity = outEvent.add_element "severity"
     if inSeverity
@@ -160,7 +160,7 @@ class LogStash::Outputs::OpenNMS < LogStash::Outputs::Base
       outSeverity.text = @opennms_severity
     end
     
-    @logger.debug("Sending OpenNMS event log", :eventlog => outEventsXML, :host => @opennms_host, :port => @opennms_port)
+    @logger.debug("Sending OpenNMS event log", :eventlog => outEventsXML.to_s, :host => @opennms_host, :port => @opennms_port)
     # Catch exceptions like ECONNRESET and friends, reconnect on failure.
     # TODO(jeffgdotorg): Test error cases. Catch exceptions. Stop cargo-culting sissel's code.
     begin
